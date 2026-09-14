@@ -5,7 +5,7 @@ import logfire
 
 app = FastAPI()
 
-logfire.configure()
+logfire.configure(send_to_logfire="if-token-present")
 logfire.instrument_fastapi(app)
 
 @app.get("/")

@@ -4,3 +4,10 @@ __pycache__/
 .env
 .pytest_cache/
 .DS_Store
+*.pdf
+
+# Certificado de proxy corporativo (Zscaler etc.) — específico da máquina, nunca vai pro git.
+# A pasta backend/certs/ em si é versionada (via .gitkeep) para o Dockerfile funcionar
+# em qualquer máquina; só os .crt dentro dela ficam de fora.
+backend/certs/*.crt
+!backend/certs/.gitkeep

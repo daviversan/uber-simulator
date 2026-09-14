@@ -11,4 +11,4 @@ python-dotenv>=1.0.1
 # Cliente Async & Utilidades
 httpx>=0.27.0
 
-logfire
+logfire[fastapi]
