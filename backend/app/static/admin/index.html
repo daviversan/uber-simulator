@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Uber Simulator — Admin</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/admin/css/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <main id="map"></main>
+
+    <aside id="sidebar">
+      <nav id="tabs">
+        <button class="tab-btn active" data-tab="simulacao">Simulação</button>
+        <button class="tab-btn" data-tab="analytics">Analytics</button>
+        <button class="tab-btn" data-tab="jobs">Jobs</button>
+      </nav>
+
+      <section id="tab-simulacao" class="tab-panel active">
+        <div class="sim-row">
+          <button id="sim-start">▶ Iniciar</button>
+          <button id="sim-pause">⏸ Pausar</button>
+          <button id="sim-reset">↺ Reset</button>
+        </div>
+
+        <form id="sim-spawn-form" class="sim-row">
+          <select id="sim-spawn-city"></select>
+          <input id="sim-spawn-count" type="number" min="1" value="1" />
+          <button type="submit">Spawn</button>
+        </form>
+
+        <form id="sim-despawn-form" class="sim-row">
+          <input id="sim-despawn-id" type="text" placeholder="driver_id" />
+          <button type="submit">Despawn</button>
+        </form>
+
+        <form id="sim-rate-form" class="sim-row">
+          <label for="sim-rate">Velocidade <span id="sim-rate-value">1.0x</span></label>
+          <input id="sim-rate" type="range" min="0.5" max="10" step="0.5" value="1" />
+        </form>
+
+        <dl id="sim-state" class="sim-state">
+          <dt>Status</dt><dd id="sim-state-status">—</dd>
+          <dt>Motoristas</dt><dd id="sim-state-count">—</dd>
+          <dt>Rate</dt><dd id="sim-state-rate">—</dd>
+        </dl>
+      </section>
+      <section id="tab-analytics" class="tab-panel">
+        <dl class="sim-state">
+          <dt>Ativos (5min)</dt><dd id="analytics-active">—</dd>
+        </dl>
+
+        <table id="analytics-by-city" class="analytics-table">
+          <thead>
+            <tr><th>Cidade</th><th>Motoristas</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+
+        <canvas id="analytics-chart" height="160"></canvas>
+        <p class="placeholder">clique num motorista no mapa pra ver a trilha dele</p>
+      </section>
+      <section id="tab-jobs" class="tab-panel">
+        <div id="jobs-list"></div>
+      </section>
+    </aside>
+
+    <footer id="status-bar">
+      <span id="status-instance">● conectando…</span>
+      <span id="status-drivers">— motoristas</span>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script type="module" src="/static/admin/js/main.js"></script>
+</body>
+</html>

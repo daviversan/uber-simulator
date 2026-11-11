@@ -1,0 +1,38 @@
+* { box-sizing: border-box; }
+[hidden] { display: none !important; } /* senão `display:flex/grid` abaixo vence o atributo hidden */
+body { margin: 0; font-family: system-ui, sans-serif; color: #18181b; background: #f4f4f5; }
+.muted { color: #71717a; }
+.mono { font-family: ui-monospace, monospace; }
+.error { color: #b91c1c; margin: 0; }
+
+#conn-status {
+  position: fixed; top: 8px; right: 12px; z-index: 1000; margin: 0;
+  padding: 4px 10px; font-size: 13px; background: #fff; border-radius: 999px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 20%);
+}
+
+#join-screen { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+#join-form {
+  width: min(380px, 100%); display: grid; gap: 12px; padding: 24px;
+  background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgb(0 0 0 / 12%);
+}
+#join-form h1 { margin: 0; font-size: 22px; }
+#join-form p { margin: 0; }
+label { display: grid; gap: 4px; font-size: 14px; font-weight: 600; }
+input, select, button { font: inherit; padding: 10px; border-radius: 8px; border: 1px solid #d4d4d8; }
+button { background: #18181b; color: #fff; border: 0; cursor: pointer; font-weight: 600; }
+button:disabled { opacity: 0.5; cursor: wait; }
+
+#drive-screen { position: relative; height: 100vh; }
+#map { position: absolute; inset: 0; }
+#hud {
+  position: absolute; z-index: 1000; left: 12px; bottom: 12px; display: grid; gap: 6px;
+  padding: 12px 14px; max-width: min(360px, calc(100% - 24px));
+  background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgb(0 0 0 / 25%);
+}
+
+/* Marcador do próprio motorista: destacado dos demais (um anel azul pulsante). */
+.me-marker span {
+  display: block; width: 22px; height: 22px; border-radius: 50%;
+  background: #2563eb; border: 3px solid #fff; box-shadow: 0 0 0 2px #2563eb;
+}

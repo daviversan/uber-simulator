@@ -1,12 +1,102 @@
+# Arquitetura:
+#
+#   navegador / simulador ──▶ nginx (:8080) ──▶ api_1..api_4 ──▶ Redis (estado atual + pub/sub)
+#                                                          └──▶ Postgres (histórico)
+#
+# As 4 APIs são idênticas e sem estado: qualquer uma atende qualquer cliente,
+# porque tudo que é compartilhado mora no Redis ou no Postgres.
+
+x-api: &api
+  build: ./backend
+  env_file: [.env]
+  environment:
+    # Montada a partir das mesmas variáveis do serviço postgres: uma senha só,
+    # num lugar só (.env).
+    DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+  # Dev: o código local é montado no container e o uvicorn recarrega a cada edição.
+  volumes:
+    - ./backend:/app
+  command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+  depends_on:
+    redis:
+      condition: service_healthy
+    migrate:
+      condition: service_completed_successfully
+  healthcheck:
+    test: ["CMD", "python", "-c",
+           "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+    interval: 10s
+    timeout: 3s
+    retries: 3
+
 services:
-  api:
-    build: ./backend
-    ports:
-      - "8000:8000"
-    env_file:
-      - .env
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
-      interval: 10s
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
       timeout: 3s
-      retries: 3
+      retries: 5
+
+  postgres:
+    image: postgres:16-alpine
+    env_file: [.env]   # POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Roda as migrations uma vez e termina. As APIs só sobem depois que ele
+  # termina com sucesso, então ninguém encontra o banco sem tabelas.
+  migrate:
+    build: ./backend
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    command: alembic upgrade head
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api_1: *api
+  api_2: *api
+  api_3: *api
+  api_4: *api
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      api_1: { condition: service_healthy }
+      api_2: { condition: service_healthy }
+      api_3: { condition: service_healthy }
+      api_4: { condition: service_healthy }
+
+  simulator:
+    build: ./simulator
+    environment:
+      - WS_URL=ws://nginx/ws
+      - REDIS_URL=redis://redis:6379/0
+      - NUM_DRIVERS=5
+      - TICK_SECONDS=1
+    depends_on:
+      nginx:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    # O simulador guarda estado na memória (a lista de bots). Duas réplicas
+    # receberiam o mesmo comando "spawn 10" e criariam 20 bots.
+    deploy:
+      replicas: 1
+
+volumes:
+  redis-data:
+  postgres-data:

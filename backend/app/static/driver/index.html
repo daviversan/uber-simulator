@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Uber Simulator — Motorista</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/static/driver/css/styles.css" />
+</head>
+<body>
+  <p id="conn-status">● conectando…</p>
+
+  <section id="join-screen">
+    <form id="join-form" novalidate>
+      <h1>Entrar no mapa</h1>
+      <p class="muted">Você será <code id="join-driver-id"></code></p>
+
+      <label>Atalho: usar uma cidade
+        <select id="join-city"><option value="">— escolher —</option></select>
+      </label>
+      <label>Latitude
+        <input id="join-lat" inputmode="decimal" autocomplete="off" placeholder="-23.5505" />
+      </label>
+      <label>Longitude
+        <input id="join-lon" inputmode="decimal" autocomplete="off" placeholder="-46.6333" />
+      </label>
+
+      <p id="join-error" class="error" role="alert" hidden></p>
+      <button type="submit">Entrar no mapa</button>
+    </form>
+  </section>
+
+  <section id="drive-screen" hidden>
+    <div id="map"></div>
+    <div id="hud">
+      <div><strong id="hud-id"></strong> <span id="hud-instance" class="muted"></span></div>
+      <div id="hud-coords" class="mono">—</div>
+      <button id="mode-toggle" type="button"></button>
+      <small id="hud-help" class="muted"></small>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="/static/driver/js/main.js"></script>
+</body>
+</html>
